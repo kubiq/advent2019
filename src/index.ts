@@ -1,12 +1,11 @@
 
 import { readFile } from 'fs';
 
-function fuel(moduleMass: number): number {
+function fuel(mass: number): number {
+    const fuelForMass = Math.floor(mass / 3) - 2;
 
-    return Math.floor(moduleMass / 3) - 2;
+    return fuelForMass > 0 ? fuelForMass + fuel(fuelForMass) : 0;
 }
-console.log(1969, fuel(1969));
-console.log(100756, fuel(100756));
 
 function sum(a: number, b: number) {
     return a + b;
@@ -17,6 +16,6 @@ readFile('data/modules.data', (err, data: Buffer) => {
 
     const modules = data.toString().split("\n").map(val => parseInt(val));
 
-    const fuels = modules.map(fuel).reduce(sum, 0);
-    console.log('fuels', fuels);
+    const fjul = modules.map(fuel).reduce(sum, 0);
+    console.log('Total Fuel', fjul);
 });
