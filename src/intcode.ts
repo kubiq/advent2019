@@ -1,12 +1,19 @@
 
 import { readFile } from 'fs';
 
-function doInstruction(opcode: number, aPosition: number, bPosition: number, resultPosition: number) {
-    let res;
+function doInstruction(operation: number, noun: number, verb: number) {
 
-    if (opcode === 1) {
-        // res = sum(instructions[instruction[1]], instructions[instruction[2]]);
+    if (operation === 1) {
+        return sum(noun, verb);
+    } else {
+        return multi(noun, verb);
     }
+}
+
+function storeResult(memory: number[], position: number, result: number) {
+    const newMemory = [...memory];
+    newMemory[position] = result;
+    return newMemory;
 }
 
 function sum(a: number, b: number): number {
@@ -17,50 +24,46 @@ function multi(a: number, b: number): number {
     return a * b;
 }
 
+function checkResult(noun: number, verb: number, result: number) {
+    if (result === 19690720) {
+        throw Error('result is ' + (noun * 100 + verb));
+    }
+}
+
+const MAX_OPCODE = 99;
+
 readFile('data/opcodes.data', (err, data: Buffer) => {
     if (err) throw err;
 
-    const instructions = data.toString().split(",").map(val => parseInt(val));
-    console.log('length', instructions.length);
+    const originalMemory = data.toString().split(",").map(val => parseInt(val));
 
-    let operation = instructions[0];
-    let instructionPointer = 0;
+    for (let noun = 0, len = MAX_OPCODE; noun <= len; noun++) {
+        for (let verb = 0, len = MAX_OPCODE; verb <= len; verb++) {
 
-    instructions[1] = 12;
-    instructions[2] = 2;
+            let memory = [...originalMemory];
+            let operation = memory[0];
+            let instructionPointer = 0;
+            memory[1] = noun;
+            memory[2] = verb;
+            let result;
 
-    do {
-        const instruction = instructions.slice(instructionPointer, instructionPointer + 4);
-        console.log('instruction', instructionPointer, instruction);
+            do {
+                const instruction = memory.slice(instructionPointer, instructionPointer + 4);
 
-        const resultPosition = instruction[3];
+                const resultPosition = instruction[3];
 
-        let res;
-        if (operation === 1) {
-            res = sum(instructions[instruction[1]], instructions[instruction[2]]);
-            instructions[resultPosition] = res;
+                result = doInstruction(operation, memory[instruction[1]], memory[instruction[2]]);
+                memory = storeResult(memory, resultPosition, result);
 
-        } else if (operation === 2) {
-            res = multi(instructions[instruction[1]], instructions[instruction[2]]);
-            instructions[resultPosition] = res;
-        } else if (operation === 99) {
-            console.log('end' );
-            // instructions[1] = 12;
-            // instructions[2] = 2;
+                instructionPointer = instructionPointer + 4;
+                operation = memory[instructionPointer];
+                result = memory[0];
+
+            } while (operation !== 99);
+
+            checkResult(noun, verb, result);
         }
-
-        instructionPointer = instructionPointer + 4;
-        operation = instructions[instructionPointer];
-
-    } while (operation !== 99);
-
-    // for (let i = 0, len = instructions.length; i < len; i = i + 4) {
-    //
-    // }
-
-
-
-    console.log('instructions', instructions);
+    }
 
 });
 
