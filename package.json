@@ -6,6 +6,7 @@
   "scripts": {
     "start:fuel": "tsc-watch --onSuccess \"node ./build/fuel.js\" --onFailure \"echo Beep! Compilation Failed\"",
     "start:program": "tsc-watch --onSuccess \"node ./build/program.js\" --onFailure \"echo Beep! Compilation Failed\"",
+    "start:wires": "tsc-watch --onSuccess \"node ./build/wires.js\" --onFailure \"echo Beep! Compilation Failed\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
